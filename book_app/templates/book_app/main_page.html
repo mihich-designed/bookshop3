@@ -1,0 +1,23 @@
+{%extends 'book_app/base.html'%}
+{% load static %}
+
+{% block title %} Книжная лавка {% endblock %}
+
+{% block content %}
+    <h1>Онлайн-библиотека «Книжная лавка»</h1>
+    <h3>Навигация по лавке:</h3>
+    <ul>
+        <li><a href="{% url 'library' %}">Библиотека лавки</a></li>
+        <li><a href="{%url 'authors'%}">Поиск по авторам</a></li>
+    </ul>
+
+
+
+    <p>Самая короткая книга недели: «{{shortest_book.title}}», {{shortest_book.page_count}} страниц!</p>
+    <p>Самая длинная книга недели: «{{longest_book.title}}», {{longest_book.page_count}} страниц!</p>
+    <p>Средний рейтинг книг в нашей библиотеке: {{agg.rating__avg}}</p>
+    <p>Всего книг в библиотеке: {{agg.id__count}}</p>
+
+
+{% include 'includes/navbar.html' %}
+{% endblock %}

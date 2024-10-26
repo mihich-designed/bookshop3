@@ -1,0 +1,71 @@
+{% extends 'book_app/base.html' %}
+
+{% load my_filters %}
+{% load static %}
+
+{% block title %}Библиотека{% endblock %}
+
+{% block content %}
+    <h2>Библиотека</h2>
+    <p>Сортировка:
+        <a href="?sorting_parameter=title">Название |</a>
+        <a href="?sorting_parameter=-rating">Высокий рейтинг |</a>
+        <a href="?sorting_parameter=-bookclick">Популярные |</a>
+        <a href="?sorting_parameter=-page_count">Сначала длинные |</a>
+        <a href="?sorting_parameter=page_count">Сначала короткие |</a>
+    </p>
+<hr>
+<div>
+    <p>Поиск: </p>
+    <form method="get" action="">
+        <input type="text" name="q" placeholder="Введите название книги">
+        <button type="submit" name="search">Найти</button>
+    </form>
+</div>
+<hr>
+<div class="categories">
+    <h3>Жанры</h3>
+    {% for genre in genres %}
+        <a href="?genre_parameter={{genre.id}}">{{genre.get_genre_display.capitalize}}</a>
+    {% endfor %}
+</div>
+    {% if search_results %}
+        <ul>
+            <div class="book-list">
+            {% for book in search_results %}
+                <div class = 'book-card'>
+                    <a href="{{ book.get_url }}">
+                        <img src="{{ book.get_cover }}" alt="{{ book.title }} " class="book-cover">
+                    </a>
+                    <div class="book-info">
+                        <a href=" {{ book.get_url }}">{{ book.title }}</a>
+                        <br>
+                        <span class="author-name">
+                            <a href="{% url 'author-info' book.author|slugify_ru %}">{{ book.author }}</a>
+                        </span>
+                        <br>
+                        {% if book.average_rating %}
+                            <span class="star">&#9733;</span>{{ book.average_rating}}
+                        {% else %}
+                            <span class="star">&#9734;</span>
+                        {% endif %}
+                        <span class="rating-count">{{ book.rating_count.rating__count }} оцен{{book.rating_end}}</span>
+                        <br>
+                        <div class="genre">
+                            <span class="genre-tag">{{ book.genre.all.0.get_genre_display.capitalize }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </ul>
+    {% else %}
+        <p>
+            К сожалению по вашему запросу в нашей библиотеке ничего не найдено :(
+            <br>
+            Попробуйте изменить запрос или фильтр.
+        </p>
+    {% endif %}
+<hr>
+{% include 'includes/navbar.html' %}
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'book_app/base.html' %}
+{%load static%}
+
+{% block title %} {{book.title}} {% endblock %}
+
+{% block content %}
+    <h2>О книге «{{book.title}}»</h2>
+    <p>Книга «{{book.title}}» опубликована в {{book.year}} году, автор - {{book.author}}.</p>
+    <p>{{book.description}}.</p>
+    <p>Рейтинг: {{avg_book_rating}}. Составляется по оценкам пользователей нашей библиотеки.
+        Количиство страниц: {{book.page_count}}.</p>
+    {% if not rating_exists and user_authenticate %}
+        <p>Оценить книгу:</p>
+            {% include 'includes/rating_line.html' %}
+    {% elif rating_exists %}
+        <p>Спасибо за оценку!</p>
+    {% elif not user_authenticate %}
+        <p>Хотите оценить книгу?<a href="{% url 'user-authorization' %}"> Авторизуйтесь.</a></p>
+    {% endif %}
+    <div class="book-download">
+    Скачать
+    {% for ebook_file in book.ebookfile_set.all %}
+        <a href="#" class="download-link"
+           data-file-url="{{ ebook_file.get_absolute_url }}"
+           data-file-type="{{ ebook_file.get_file_type_display }}">
+            {{ ebook_file.get_file_type_display }}
+        </a>
+    {% endfor %}
+    </div>
+
+<script>
+  const downloadLinks = document.querySelectorAll('.download-link');
+
+   downloadLinks.forEach(link => {
+     link.addEventListener('click', (event) => {
+       event.preventDefault(); // Отменяем стандартное поведение ссылки
+
+       const fileUrl = link.dataset.fileUrl; // Получаем URL файла
+       const fileType = link.dataset.fileType.toLowerCase(); // Получаем тип файла и переводим в нижний регистр
+
+       // Создаем скрытый элемент <a> для скачивания
+       const downloadLink = document.createElement('a');
+       downloadLink.href = new URL(fileUrl, window.location.origin).href; // Преобразуем в абсолютный URL
+       downloadLink.download = fileUrl.split('/').pop(); // Устанавливаем имя файла для скачивания
+
+       // Добавляем ссылку в DOM
+       document.body.appendChild(downloadLink);
+
+       // Кликаем по скрытой ссылке для запуска скачивания
+       downloadLink.click();
+
+       // Удаляем ссылку из DOM
+       document.body.removeChild(downloadLink);
+     });
+   });
+</script>
+
+{% include 'includes/navbar.html' %}
+{% endblock %}

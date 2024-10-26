@@ -1,0 +1,20 @@
+{% extends 'book_app/base.html' %}
+{% load static %}
+
+{% block title %} Авторизация {% endblock %}
+
+{% block content %}
+    <h2>Авторизация</h2>
+    <form method="POST" id="login-form" action="{% url 'user-authorization' %}">
+        {% csrf_token %}
+        <div class = 'form-style'>
+            {{form.as_p}}
+            <button type="submit">Войти</button>
+            <a href="{% url 'user-registration' %}">Создать аккаунт</a>
+        </div>
+        <a href="{% url 'account-recovery' %}">Забыл пароль</a>
+    </form>
+
+{% include 'includes/navbar.html' %}
+
+{% endblock %}

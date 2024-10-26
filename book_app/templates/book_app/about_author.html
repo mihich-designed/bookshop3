@@ -1,0 +1,20 @@
+{%extends 'book_app/base.html'%}
+{%load my_filters%}
+{%load static %}
+
+{% block title %} {{ author.full_name }} {% endblock %}
+
+{% block content %}
+    <h2>{{ author.full_name }}</h2>
+<hr>
+    <p>«{{author.description}}» - {{author.full_name}}.</p>
+<hr>
+    <h3>Книги автора:</h3>
+        {% for book in books %}
+            <ul>
+                <li><a href="{{ book.get_url }}">«{{book.title}}»</a></li>
+            </ul>
+        {% endfor %}
+
+{% include 'includes/navbar.html' %}
+{% endblock %}

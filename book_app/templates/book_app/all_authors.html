@@ -1,0 +1,17 @@
+{%extends 'book_app/base.html'%}
+
+{% load my_filters %}
+{% load static %}
+
+{% block title %} Писатели {% endblock %}
+
+{% block content %}
+    <h2>Поиск по авторам</h2>
+    {% for author in authors %}
+        <ul>
+            <li><a href="{% url 'author-info' author.full_name|slugify_ru %}">{{author.full_name}}</a></li>
+        </ul>
+    {% endfor %}
+
+{% include 'includes/navbar.html' %}
+{% endblock %}

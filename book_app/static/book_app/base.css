@@ -1,0 +1,172 @@
+
+body {
+ margin: 0;
+ font-family: 'Sans-Serif', Arial, sans-serif; /* Используем 'Sans-Serif' как основной шрифт, с резервными вариантами */
+ background-color: #f8f8f8; /* Светло-серый фон */
+ color: #333; /* Серый цвет текста */
+ line-height: 1.6; /* Межстрочное расстояние */
+ padding-left: 20px; /* Добавляем отступ в 20px */
+}
+
+h1, h2, h3, h4, h5, h6 {
+ font-weight: normal; /* Нормальный вес заголовков */
+}
+
+p {
+ font-size: 1rem;
+ line-height: 1.5;
+ margin-bottom: 1rem;
+}
+
+a {
+ color: #000; /* Обычный черный цвет */
+ text-decoration: none;
+}
+
+a:hover {
+ color: #bf0d55; /* Цвет при наведении */
+ text-decoration: none;
+}
+
+/* Стили для контента */
+.container {
+ max-width: 1200px; /* Увеличиваем максимальную ширину контента */
+ margin: 2rem auto; /* Отступы для централирования контента */
+ padding: 1rem;
+}
+
+/* Дополнительные стили для блоков */
+.content {
+ padding: 2rem;
+ background-color: #fff; /* Белый фон для блоков контента */
+ border-radius: 5px;
+ box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Добавляем небольшую тень для глубины */
+}
+
+/* Стиль для навигации */
+nav {
+ background-color: #fff; /* Белый фон для навигации */
+ padding: 1rem;
+ border-bottom: 1px solid #ddd;
+}
+
+nav a {
+ display: inline-block;
+ padding: 0.5rem 1rem;
+ text-decoration: none;
+ color: #333;
+ transition: background-color 0.3s ease;
+}
+
+nav a:hover {
+ background-color: #eee;
+}
+
+.book-cover {
+ width: 100px;
+ height: 200px;
+}
+
+.book-list {
+ display: flex; /* Изменяем на flexbox */
+ flex-wrap: wrap; /* Разбиваем карточки на строки */
+ justify-content: flex-start; /* Выравниваем по левому краю */
+}
+
+.book-card {
+ display: flex;
+ flex-direction: row; /* Делаем карточки вертикальными */
+ width: calc(18% - 20px); /* Ширина карточки, 4 карточки в строке */
+ margin: 10px;
+ border: 2px solid #ccc;
+ padding: 10px;
+ border-radius: 5px;
+ box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+ text-decoration: none; /* Убирает подчеркивание по умолчанию */
+ color: inherit; /* Использует цвет текста по умолчанию */
+ align-items: center; /* Выравнивание по вертикали */
+ gap: 1rem; /* Отступ между картинкой и текстом */
+}
+
+.book-card:hover {
+ /* text-decoration: underline; */
+ /* color: blue; */
+}
+
+.book-card img {
+ width: 80%; /* Ширина изображения занимает 80% ширины карточки */
+ height: auto;
+ margin-bottom: 10px;
+ max-width: 100px; /* Сделаем ширину изображения меньше */
+ height: auto;
+ margin-right: 15px;
+ object-fit: cover; /* Подгонка изображения к блоку */
+}
+
+.book-info {
+ /* ... */
+ /* text-align: left; /* Выравнивание текста слева */
+}
+
+.book-card h3 {
+ font-size: 1.1em;
+ margin-bottom: 5px;
+}
+
+.book-card p {
+ margin-bottom: 10px;
+ line-height: 1.5;
+}
+
+.genres {
+ display: inline-block;
+ margin-left: 10px;
+}
+
+.genre-tag {
+ display: inline-block;
+ padding: 5px 10px;
+ margin: 0 5px 5px 0;
+ background-color: #f2f2f2; /* Светло-серый цвет */
+ border-radius: 5px; /* Скругление углов */
+}
+
+/* Медиа-запросы */
+@media (min-width: 768px) {
+ .book-card {
+  width: calc(25% - 20px); /* 4 карточки в строку на больших экранах */
+ }
+}
+
+@media (max-width: 767px) {
+ .book-card {
+  flex-direction: column;
+  width: 100%; /* Карточки занимают всю ширину на мобильных */
+ }
+}
+
+@media (min-width: 1200px) {
+ .container {
+  max-width: 1200px; /* Увеличиваем максимальную ширину контейнера */
+ }
+}
+
+.star {
+    color: #ffcc00; /* Цвет звезд */
+    font-size: 1.5rem; /* Размер звезд */
+    margin-right: 3px; /* Отступ между звёздочками */
+}
+
+.rating-count {
+    color: #666666;
+    font-style: italic;
+    font-size: 0.9em; /* Уменьшение размера шрифта на 10% */
+}
+
+.author-name a {
+    color: #666666;
+}
+
+.author-name a:hover {
+    color: #000;
+}
