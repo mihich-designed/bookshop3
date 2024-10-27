@@ -2,6 +2,7 @@ from transliterate import translit
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from .models import User, Rating, BookClick
+from .forms import UserFeedback
 from django.db.models import F, Sum, Min, Max, Count, Avg, Value
 from django.db.models.functions import Round
 from django.utils.crypto import get_random_string
@@ -19,14 +20,13 @@ def transliter(slug: str):
 def rating_check(request, rating_exists, book, user):
     '''Проверка наличия оценки книги пользователем за одну сессию'''
     if request.method == 'POST':  # Проверяем метод запроса
-        user_rating = request.POST.get('rating', None)  # Проверяем существование ключа 'rating', если его нет -
-        # user_rating = None
-        if user_rating:
-            if not rating_exists:  # Проверяем существование оценки данной книги данным пользователем
-                rating = Rating(book=book, user=user, rating=user_rating)
-                # rating.rating = round((rating.rating * rating.rating_count + float(user_rating)) / (rating.rating_count + 1),
-                #                     1)
-                rating.save()
+        form = UserFeedback(request.POST)
+        if form.is_valid():
+            user_rating = form.cleaned_data.get('rating', None)  # Проверяем существование ключа 'rating', если его нет -
+            if user_rating:
+                if not rating_exists:  # Проверяем существование оценки данной книги данным пользователем
+                    rating = Rating(book=book, user=user, rating=user_rating)
+                    rating.save()
 
 def avg_rating(request, book):
     try:

@@ -3,7 +3,12 @@ from .models import User, Rating
 from django.contrib.auth.forms import AuthenticationForm
 
 class UserFeedback(forms.Form):
-    pass
+    RATINGS = [
+        (1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'),
+        (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10'),
+    ]
+    rating = forms.ChoiceField(widget=forms.RadioSelect, choices=RATINGS, label='Рейтинг')
+    feedback = forms.CharField(label='Отзыв')
 
 class UserAuthorizationForm(AuthenticationForm):
     username = forms.CharField(label='Логин', required=True)

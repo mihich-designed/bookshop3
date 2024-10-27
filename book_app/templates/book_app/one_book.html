@@ -10,8 +10,14 @@
     <p>Рейтинг: {{avg_book_rating}}. Составляется по оценкам пользователей нашей библиотеки.
         Количиство страниц: {{book.page_count}}.</p>
     {% if not rating_exists and user_authenticate %}
-        <p>Оценить книгу:</p>
-            {% include 'includes/rating_line.html' %}
+        <p>Отавить отзыв:</p>
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class = 'form-style'>
+                    {{ form.as_p }}
+                    <button type="submit">Отправить</button>
+                </div>
+            </form>
     {% elif rating_exists %}
         <p>Спасибо за оценку!</p>
     {% elif not user_authenticate %}
