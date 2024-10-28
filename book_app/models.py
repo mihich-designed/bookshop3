@@ -94,7 +94,7 @@ class User(AbstractUser):
     phone_number = models.IntegerField(blank=True, null=True, verbose_name='Телефон', unique=True)
 
     def __str__(self):
-        return f'Логин: {self.username}'
+        return f'{self.username}'
 
 
 class Rating(models.Model):

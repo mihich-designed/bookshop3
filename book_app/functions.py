@@ -22,10 +22,11 @@ def rating_check(request, rating_exists, book, user):
     if request.method == 'POST':  # Проверяем метод запроса
         form = UserFeedback(request.POST)
         if form.is_valid():
-            user_rating = form.cleaned_data.get('rating', None)  # Проверяем существование ключа 'rating', если его нет -
+            user_rating = form.cleaned_data.get('rating', None)  # Проверяем существование ключа 'rating'
+            user_feedback = form.cleaned_data.get('feedback', None)
             if user_rating:
                 if not rating_exists:  # Проверяем существование оценки данной книги данным пользователем
-                    rating = Rating(book=book, user=user, rating=user_rating)
+                    rating = Rating(book=book, user=user, rating=user_rating, feedback=user_feedback)
                     rating.save()
 
 def avg_rating(request, book):

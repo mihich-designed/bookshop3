@@ -148,6 +148,8 @@ def show_one_book(request, book_slug: str):
         avg_book_rating = functions.avg_rating(request, book)
         rating_exists = False # По умолчанию
         form = UserFeedback()
+        ratings = Rating.objects.filter(book=book)
+        # book_feedbacks = [rating.feedback for rating in ratings]
         if request.user.is_authenticated:
             user = User.objects.get(username=request.user.username)
             rating_exists = Rating.objects.filter(book=book, user=user).exists()
@@ -158,7 +160,8 @@ def show_one_book(request, book_slug: str):
                 'user_authenticate': request.user.is_authenticated,
                 'rating_exists': rating_exists,
                 'avg_book_rating': avg_book_rating,
-                'form': form
+                'form': form,
+                'ratings': ratings
             })
     except Book.DoesNotExist:
         return render(request, 'book_app/404.html', {
