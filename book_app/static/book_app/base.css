@@ -170,3 +170,17 @@ nav a:hover {
 .author-name a:hover {
     color: #000;
 }
+
+.profile-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 15%;
+  object-fit: cover;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+  border: 2px solid #ccc;
+  transition: box-shadow 0.3s ease;
+}
+
+.profile-photo:hover {
+  transform: scale(1.05); /*  Увеличить  фото  при  наведении  */
+}

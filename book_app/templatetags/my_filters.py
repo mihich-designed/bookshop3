@@ -11,3 +11,4 @@ def slugify_ru(value):
 @register.filter(name='reverslugify')
 def revers_slugify(slug):
     return translit(slug, 'ru').title().replace('-', ' ')
+

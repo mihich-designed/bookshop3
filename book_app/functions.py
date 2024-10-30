@@ -2,7 +2,7 @@ from transliterate import translit
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from .models import User, Rating, BookClick
-from .forms import UserFeedback
+from .forms import UserFeedbackForm
 from django.db.models import F, Sum, Min, Max, Count, Avg, Value
 from django.db.models.functions import Round
 from django.utils.crypto import get_random_string

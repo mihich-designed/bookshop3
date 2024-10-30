@@ -4,8 +4,17 @@
 {% block title %} Личный кабинет {% endblock %}
 
 {% block content %}
+
     <h2>Личный кабинет</h2>
-    {{ user }}
+    <img src="{{ user.profile_photo.url }}" alt="Фото профиля" class="profile-photo"> {{ user }}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>Загрузить фото профиля:</p>
+        {{ form.profile_photo }}
+        <button type="submit" name="upload">Сохранить</button>
+        <button type="submit" name="delete_photo">Удалить фото</button>
+    </form>
+
     <form method="post" action="">
         {% csrf_token %}
         <button type="submit" name="logout">Выйти из профиля</button>
