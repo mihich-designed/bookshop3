@@ -1,21 +1,25 @@
+body {
+  padding-bottom: 60px; /* Задайте высоту navbar */
+}
+
 nav {
-  background-color: #fff;
-  padding: 1rem;
-  border-bottom: 1px solid #ddd;
-  position: fixed; /* Делаем навигацию фиксированной */
-  bottom: 0; /* Размещаем внизу страницы */
-  left: 0; /* Размещаем с левой стороны */
-  width: 100%; /* Занимаем всю ширину */
+ background-color: #fff;
+ padding: 1rem;
+ border-bottom: 1px solid #ddd;
+ position: fixed; /* Делаем навигацию абсолютной */
+ bottom: 0; /* Размещаем внизу страницы */
+ left: 0; /* Размещаем с левой стороны */
+ width: 100%; /* Занимаем всю ширину */
 }
 
 nav a {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-  color: #bf0d55;
-  transition: background-color 0.3s ease;
+ display: inline-block;
+ padding: 0.5rem 1rem;
+ text-decoration: none;
+ color: #bf0d55;
+ transition: background-color 0.3s ease;
 }
 
 nav a:hover {
-  background-color: #eee;
+ background-color: #eee;
 }

@@ -1,7 +1,14 @@
 from django import forms
-from .models import User
+from .models import User, Rating
 from django.contrib.auth.forms import AuthenticationForm
 
+class UserFeedback(forms.Form):
+    RATINGS = [
+        (1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'),
+        (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10'),
+    ]
+    rating = forms.ChoiceField(widget=forms.RadioSelect, choices=RATINGS, label='Рейтинг')
+    feedback = forms.CharField(label='Отзыв')
 
 class UserAuthorizationForm(AuthenticationForm):
     username = forms.CharField(label='Логин', required=True)
@@ -85,30 +92,3 @@ class UserRegistrationForm(forms.ModelForm):
         elif len(password) > 25:
             raise forms.ValidationError("Введите пароль не длиннее 25 символов.")
         return cleaned_data
-
-
-
-# class UserAuthorizationForm(forms.Form):
-#     username = forms.CharField(label="Логин", max_length=150, required=True)
-#     password = forms.CharField(label="Пароль", widget=forms.PasswordInput, required=True)
-#
-#     def __init__(self, *args, **kwargs):
-#         request = kwargs.pop('request', None)
-#         super().__init__(*args, **kwargs)
-#
-#         self.request = request
-#
-#     def clean(self):
-#         cleaned_data = super().clean()
-#         username = cleaned_data.get("username")
-#         password = cleaned_data.get("password")
-#         # Добавьте проверку username и password здесь
-#         # try:
-#         #     user = User.objects.get(username=username)
-#         # except User.DoesNotExists:
-#         #     raise forms.ValidationError("Пользователя с таким логином не существует")
-#         # if user is not None:
-#         #     if password != user.password:
-#         #         raise forms.ValidationError("Неверный пароль")
-#
-#         return cleaned_data

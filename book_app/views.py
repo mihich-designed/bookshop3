@@ -3,7 +3,7 @@ from django.urls import reverse
 from .models import Book, Author, User, Rating, Genre, EBookFile
 from . import functions
 from django.db.models import F, Sum, Min, Max, Count, Avg, Value, Q
-from .forms import UserRegistrationForm, UserAuthorizationForm, AccountRecoveryForm, PasswordResetForm, SetNewPassword
+from .forms import UserRegistrationForm, UserAuthorizationForm, AccountRecoveryForm, PasswordResetForm, SetNewPassword, UserFeedback
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -142,12 +142,14 @@ def show_one_book(request, book_slug: str):
     - Проверяет в модели Rating наличие записей об оценки данной книги авторизованным пользователем
     - Если пользователь не авторизован, предлагает войти для оценки
     - Вспомогательная функция rating_chek проверяет наличие записи и обновляет рейтинг
-    - ТЕСТ ДЛЯ ГИТА
     '''
     try:
         book = Book.objects.get(slug=book_slug)
         avg_book_rating = functions.avg_rating(request, book)
         rating_exists = False # По умолчанию
+        form = UserFeedback()
+        ratings = Rating.objects.filter(book=book)
+        # book_feedbacks = [rating.feedback for rating in ratings]
         if request.user.is_authenticated:
             user = User.objects.get(username=request.user.username)
             rating_exists = Rating.objects.filter(book=book, user=user).exists()
@@ -158,6 +160,8 @@ def show_one_book(request, book_slug: str):
                 'user_authenticate': request.user.is_authenticated,
                 'rating_exists': rating_exists,
                 'avg_book_rating': avg_book_rating,
+                'form': form,
+                'ratings': ratings
             })
     except Book.DoesNotExist:
         return render(request, 'book_app/404.html', {

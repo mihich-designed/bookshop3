@@ -10,42 +10,42 @@
     <p>Рейтинг книжной лавки: {{avg_book_rating}}.
         Количиство страниц: {{book.page_count}}.</p>
     {% if book.ebookfile_set.first is not None %}
-        <div class="book-download">
-        Скачать
-        {% for ebook_file in book.ebookfile_set.all %}
-            <a href="#" class="download-link"
-               data-file-url="{{ ebook_file.get_absolute_url }}"
-               data-file-type="{{ ebook_file.get_file_type_display }}">
-                {{ ebook_file.get_file_type_display }}
-            </a>
-        {% endfor %}
-            <script>
-              const downloadLinks = document.querySelectorAll('.download-link');
+    <div class="book-download">
+    Скачать
+    {% for ebook_file in book.ebookfile_set.all %}
+        <a href="#" class="download-link"
+           data-file-url="{{ ebook_file.get_absolute_url }}"
+           data-file-type="{{ ebook_file.get_file_type_display }}">
+            {{ ebook_file.get_file_type_display }}
+        </a>
+    {% endfor %}
+        <script>
+          const downloadLinks = document.querySelectorAll('.download-link');
 
-               downloadLinks.forEach(link => {
-                 link.addEventListener('click', (event) => {
-                   event.preventDefault(); // Отменяем стандартное поведение ссылки
+           downloadLinks.forEach(link => {
+             link.addEventListener('click', (event) => {
+               event.preventDefault(); // Отменяем стандартное поведение ссылки
 
-                   const fileUrl = link.dataset.fileUrl; // Получаем URL файла
-                   const fileType = link.dataset.fileType.toLowerCase(); // Получаем тип файла и переводим в нижний регистр
+               const fileUrl = link.dataset.fileUrl; // Получаем URL файла
+               const fileType = link.dataset.fileType.toLowerCase(); // Получаем тип файла и переводим в нижний регистр
 
-                   // Создаем скрытый элемент <a> для скачивания
-                   const downloadLink = document.createElement('a');
-                   downloadLink.href = new URL(fileUrl, window.location.origin).href; // Преобразуем в абсолютный URL
-                   downloadLink.download = fileUrl.split('/').pop(); // Устанавливаем имя файла для скачивания
+               // Создаем скрытый элемент <a> для скачивания
+               const downloadLink = document.createElement('a');
+               downloadLink.href = new URL(fileUrl, window.location.origin).href; // Преобразуем в абсолютный URL
+               downloadLink.download = fileUrl.split('/').pop(); // Устанавливаем имя файла для скачивания
 
-                   // Добавляем ссылку в DOM
-                   document.body.appendChild(downloadLink);
+               // Добавляем ссылку в DOM
+               document.body.appendChild(downloadLink);
 
-                   // Кликаем по скрытой ссылке для запуска скачивания
-                   downloadLink.click();
+               // Кликаем по скрытой ссылке для запуска скачивания
+               downloadLink.click();
 
-                   // Удаляем ссылку из DOM
-                   document.body.removeChild(downloadLink);
-                 });
-               });
-            </script>
-        </div>
+               // Удаляем ссылку из DOM
+               document.body.removeChild(downloadLink);
+             });
+           });
+        </script>
+    </div>
     {% else %}
         <p>На данный момент в нашей библиотеке нет электронной версии книги, но вы можете поделиться своим мнением об этом произведении в отзывах!</p>
     {% endif %}
@@ -62,6 +62,7 @@
         <p>Хотите оценить книгу?<a href="{% url 'user-authorization' %}"> Авторизуйтесь.</a></p>
     {% endif %}
     <div class="feedback">
+<<<<<<< HEAD
     <p>Отзывы:</p>
     {% if ratings %}
         {% for rating in ratings %}
@@ -82,6 +83,25 @@
 </div>
 
 
+=======
+        {% if ratings %}
+            {% for rating in ratings %}
+                {{ rating.user }}
+        <br>
+                <span class="star">&#9733;</span>{{ rating.rating }}
+                {% if rating.feedback is not None %}
+                    {{ rating.feedback }}
+                {% else %}
+                {% endif %}
+
+        <br>
+                {{ rating.created_at }}
+        <hr>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+>>>>>>> dd9430f32379775b6455f67d7bcc897ff252b8a8
 
 {% include 'includes/navbar.html' %}
 {% endblock %}

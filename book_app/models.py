@@ -65,7 +65,7 @@ class Book(models.Model):
     slug = models.SlugField(default='', blank=True)
     description = models.CharField(max_length=500, default='Описание будет добавлено позже', verbose_name="Описание")
     format = models.CharField(max_length=1, choices=BOOK_FORMATS, default=F, verbose_name="Формат")
-    author = models.ForeignKey(Author, on_delete=models.PROTECT, null=True, default = 'Автор')
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, null=True, default = 'Автор')
     genre = models.ManyToManyField(Genre)
 
     def save(self, *args, **kwargs):
@@ -94,11 +94,11 @@ class User(AbstractUser):
     phone_number = models.IntegerField(blank=True, null=True, verbose_name='Телефон', unique=True)
 
     def __str__(self):
-        return f'Логин: {self.username}'
+        return f'{self.username}'
 
 
 class Rating(models.Model):
-    '''Рейтинг книги'''
+    '''Хранит отзывы пользователя и рейтинги книги'''
     RATING = [
         (1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'),
         (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10'),
@@ -106,6 +106,7 @@ class Rating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     rating = models.IntegerField(null=True, blank=True, choices=RATING, verbose_name="Рейтинг",)
+    feedback = models.CharField(max_length=1000, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -162,4 +163,3 @@ class EBookFile(models.Model):
     def get_absolute_url(self):
         # В self.ebook.name делим и берем последнее, тк возвращает ebooks/filename.filetype
         return f'content/ebooks/{self.book.slug}/{self.ebook.name.split('/')[-1]}'
-
