@@ -170,3 +170,83 @@ nav a:hover {
 .author-name a:hover {
     color: #000;
 }
+
+.profile-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 15%;
+  object-fit: cover;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
+  border: 2px solid #ccc;
+  transition: box-shadow 0.3s ease;
+}
+
+.profile-photo:hover {
+  transform: scale(1.05); /*  Увеличить  фото  при  наведении  */
+}
+
+.icon-profile-photo:hover {
+  transform: scale(1.05); /*  Увеличить  фото  при  наведении  */
+}
+
+.feedback {
+  /* Стиль для контейнера с отзывами */
+}
+
+.feedback .icon-profile-photo {
+  /* Стили для фото профиля */
+  width: 50px;
+  height: 50px;
+  border-radius: 15%;
+  object-fit: cover;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
+  border: 2px solid #ccc;
+  transition: box-shadow 0.3s ease;
+  float: left; /* Фото слева */
+  margin-right: 10px; /* Отступ справа от фото */
+}
+
+.feedback .icon-profile-photo:hover {
+  transform: scale(1.05); /*  Увеличить  фото  при  наведении  */
+}
+
+.feedback .rating-info {
+  /* Стиль для блока с информацией об оценке */
+  float: left; /* Информация слева */
+  margin-left: 10px; /* Отступ слева от фото */
+  width: 100%; /* Занимаем всю ширину */
+}
+
+.feedback .rating-info .user-name {
+  /* Стили для имени пользователя */
+  display: block; /* Рядом с звездой */
+}
+
+.feedback .rating-info .star {
+  /* Стили для звезды */
+  display: inline-block; /* Рядом с именем */
+  margin-right: 1px; /* Отступ справа от звезды */
+}
+
+.feedback .rating-info .rating-value {
+  /* Стили для значения оценки */
+  display: inline-block; /* Рядом со звездой */
+}
+
+.feedback .rating-info .feedback-text {
+  /* Стили для текста отзыва */
+  margin-bottom: 2px; /* Отступ снизу от отзыва */
+}
+
+.feedback .created-at {
+  /* Стили для даты создания */
+  clear: both; /* Сбрасываем float */
+  display: block; /* Рядом с звездой */
+}
+
+.feedback hr {
+  /* Стиль для разделительной линии */
+  margin-top: 15px; /* Отступ сверху от отзыва */
+  margin-bottom: 10px; /* Отступ снизу от отзыва */
+  clear: both;
+}
