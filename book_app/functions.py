@@ -2,15 +2,13 @@ from transliterate import translit
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from .models import User, Rating, BookClick
-from .forms import UserFeedback
+from .forms import UserFeedbackForm
 from django.db.models import F, Sum, Min, Max, Count, Avg, Value
 from django.db.models.functions import Round
 from django.utils.crypto import get_random_string
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
-import os
-from mechanize import Browser
-import re
+import webbrowser
 
 def transliter(slug: str):
     '''Транслит переданного url-запроса в кириллицу для обработки ошибки 404'''
@@ -104,5 +102,6 @@ def rating_count_end(request, book):
         end = 'ка'
     return end
 
-
+def ebooks_downloared():
+    webbrowser.open('https://royallib.com/book/fitsdgerald_frensis/velikiy_getsbi.html')
 

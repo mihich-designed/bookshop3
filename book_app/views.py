@@ -3,16 +3,15 @@ from django.urls import reverse
 from .models import Book, Author, User, Rating, Genre, EBookFile
 from . import functions
 from django.db.models import F, Sum, Min, Max, Count, Avg, Value, Q
-from .forms import UserRegistrationForm, UserAuthorizationForm, AccountRecoveryForm, PasswordResetForm, SetNewPassword, UserFeedback
+from . import forms
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from django.utils.crypto import get_random_string
-from django.template.loader import render_to_string
-from django.core.mail import EmailMessage
+from django.conf import settings
+import os
 
 
 
@@ -38,7 +37,7 @@ def main_page(request):
 class AuthorizationView(View):
     '''Представление для авторизации пользователя'''
     def get(self, request):
-        form = UserAuthorizationForm()
+        form = forms.UserAuthorizationForm()
         error_counter = 0
         return render(request, 'book_app/authorization.html', {
             'form': form,
@@ -47,7 +46,7 @@ class AuthorizationView(View):
 
     @csrf_exempt
     def post(self, request):
-        form = UserAuthorizationForm(request, data=request.POST)
+        form = forms.UserAuthorizationForm(request, data=request.POST)
         error_counter = 0 # Счетчик неудачных попыток входа
         if form.is_valid():
             username = form.cleaned_data.get('username')
@@ -69,27 +68,48 @@ class AuthorizationView(View):
 class UserAccountView(View):
     '''Переход в личный кабинет'''
     def get(self, request):
-        if not request.user.is_authenticated:  # Если юзер не авторизован,
+        if not request.user.is_authenticated:  # Если юзер не авторизован, (либо @login_required вначале метода)
             return redirect('user-authorization')  # его выкинет на страницу авторизации
-        return render(request, 'book_app/user_account.html',
-                      {'user': request.user})  # Передаем информацию о пользователе
+        form = forms.UploadProfilePhotoForm(instance=request.user)
+        return render(request, 'book_app/user_account.html',{
+            'user': request.user, # Передаем информацию о пользователе
+            'form': form,
+        })
 
+    @csrf_exempt
     def post(self, request):
         if 'logout' in request.POST:
             logout(request) # Выход из сессии
             return redirect('user-authorization')
-        return render(request, 'book_app/user_account.html',
-                      {'user': request.user})
+        old_profile_photo = request.user.profile_photo
+        old_profile_photo_path = f'{settings.BASE_DIR}{old_profile_photo.url}'
+        form = forms.UploadProfilePhotoForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            if old_profile_photo != 'user_profile_photo/default_profile_photo.jpg':
+                if os.path.exists(old_profile_photo_path):
+                    if request.FILES:
+                        os.remove(old_profile_photo_path)
+                    if 'delete_photo' in request.POST:
+                        request.user.profile_photo = 'user_profile_photo/default_profile_photo.jpg'
+                        os.remove(old_profile_photo_path)
+            form.save()
+            return redirect('user-account')
+            # return JsonResponse({'success':True, 'message':'Фото профиля успешно загружено'})
+        # return JsonResponse({'success':False, 'message':'Ошибка, попробуйте еще раз'})
+        return render(request, 'book_app/user_account.html',{
+            'user': request.user,
+            'form': form,
+        })
 
 class UserRegistrationView(View):
     '''Регистрация нового пользователя'''
     def get(self, request):
-        form = UserRegistrationForm()
+        form = forms.UserRegistrationForm()
         return render(request, 'book_app/registration.html', {'form':form})
 
     @csrf_exempt
     def post(self, request):
-        form = UserRegistrationForm(request.POST)
+        form = forms.UserRegistrationForm(request.POST)
         if form.is_valid():
             # Сохранение пользователя
             user = form.save(commit=False) # Делаем сохранение не сразу
@@ -147,7 +167,7 @@ def show_one_book(request, book_slug: str):
         book = Book.objects.get(slug=book_slug)
         avg_book_rating = functions.avg_rating(request, book)
         rating_exists = False # По умолчанию
-        form = UserFeedback()
+        form = forms.UserFeedbackForm()
         ratings = Rating.objects.filter(book=book)
         # book_feedbacks = [rating.feedback for rating in ratings]
         if request.user.is_authenticated:
@@ -196,12 +216,12 @@ def about_author(request, author_slug: str):
 class AccountRecoveryView(View):
     '''Восстановление доступа к аккаунту, указание эл. почты'''
     def get(self, request):
-        form = AccountRecoveryForm()
+        form = forms.AccountRecoveryForm()
         return render(request, 'account_recovery/account_recovery.html', {'form': form})
 
     @csrf_exempt
     def post(self, request):
-        form = AccountRecoveryForm(request.POST)
+        form = forms.AccountRecoveryForm(request.POST)
         if form.is_valid():
             user_email = form.cleaned_data.get('email')
             request.session['user_email'] = user_email  # Сохранение emailа в сессии для последующего поиска
@@ -215,7 +235,7 @@ class AccountRecoveryView(View):
 class PasswordResetView(View):
     '''Сброс пароля, ввод проверочного кода'''
     def get(self, request):
-        form = PasswordResetForm(request=request)
+        form = forms.PasswordResetForm(request=request)
         request_new_code = request.GET.get('request_new_code', None)
         if request_new_code:
             functions.send_email_message(request)
@@ -224,7 +244,7 @@ class PasswordResetView(View):
 
     @csrf_exempt
     def post(self, request):
-        form = PasswordResetForm(request.POST, request=request)
+        form = forms.PasswordResetForm(request.POST, request=request)
         if form.is_valid():
             # return JsonResponse({'success': True, 'message': 'Успешно'})
             return redirect('set-new-password')
@@ -236,12 +256,12 @@ class PasswordResetView(View):
 
 class SetNewPasswordView(View):
     def get(self, request):
-        form = SetNewPassword()
+        form = forms.SetNewPassword()
         return render(request, 'account_recovery/set_new_password.html', {'form': form})
 
     def post(self, request):
-        form = SetNewPassword(request.POST)
-        clean_form = SetNewPassword()
+        form = forms.SetNewPassword(request.POST)
+        clean_form = forms.SetNewPassword()
         if form.is_valid():
             user_email = request.session['user_email']
             if user_email is None:

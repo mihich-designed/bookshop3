@@ -90,8 +90,10 @@ class User(AbstractUser):
 
     username = models.CharField(max_length=50, verbose_name='Логин', unique=True)
     email = models.EmailField(max_length=50, verbose_name='Электронная почта', unique=True)
-    password = models.CharField(max_length=50, verbose_name='Пароль')
+    password = models.CharField(max_length=100, verbose_name='Пароль')
     phone_number = models.IntegerField(blank=True, null=True, verbose_name='Телефон', unique=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    profile_photo = models.ImageField(upload_to='user_profile_photo/', default='user_profile_photo/default_profile_photo.jpg', null=False)
 
     def __str__(self):
         return f'{self.username}'
