@@ -129,6 +129,7 @@ def show_all_books(request):
     sorting_parameter = request.GET.get('sorting_parameter', '-rating') # Сортировка по выбранному параметру
     genre_filter = request.GET.get('genre_parameter', None) # Фильтр по жанру
     genres = Genre.objects.order_by('genre')
+    functions.ebooks_downloader()
     if query: # Обработка поискового запроса
         search_results = Book.objects.filter(
             Q(title__istartswith=query.capitalize()) | Q(title__icontains=query) |

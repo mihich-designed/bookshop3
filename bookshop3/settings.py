@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'book_app',
     'django_extensions',
     'debug_toolbar',
+    'bookshop_storages',
+
 ]
 
 MIDDLEWARE = [
@@ -116,11 +118,35 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Настройки S3 хранилища
+
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL')
+AWS_S3_USE_SSL = int(os.getenv('AWS_S3_USE_SSL', default=1))
+AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME')
+
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+STATIC_BUCKET_NAME = os.getenv('STATIC_BUCKET_NAME')
+MEDIA_BUCKET_NAME = os.getenv('MEDIA_BUCKET_NAME')
+CONTENT_BUCKET_NAME = os.getenv('CONTENT_BUCKET_NAME')
+
+USE_S3 = int(os.getenv('USE_S3', default=1))
+
+if USE_S3:
+    STATIC_URL = f'{AWS_S3_ENDPOINT_URL}/{STATIC_BUCKET_NAME}/'
+    STATICFILES_STORAGE = 'bookshop_storages.storages_config.StaticStorage'
+
+    MEDIA_URL = f'{AWS_S3_ENDPOINT_URL}/{MEDIA_BUCKET_NAME}/'
+    DEFAULT_FILE_STORAGE = 'myapp.storages.MediaStorage'
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
+
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR,'content')
+    os.path.join(BASE_DIR,'static')
 ]
 
 STATIC_URL = 'static/'
