@@ -84,7 +84,7 @@ class UserAccountView(View):
         old_profile_photo_file = old_profile_photo
         form = forms.UploadProfilePhotoForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
-            if not User.is_default_profile_photo(request.user): # Если фото профиля не дефолтное
+            if old_profile_photo.name != 'user_profile_photo/default_profile_photo.jpg': # Если фото профиля не дефолтное
                 if old_profile_photo_file: # Если существует данный файл
                     if request.FILES:
                         # Удаление старого фото из хранилища

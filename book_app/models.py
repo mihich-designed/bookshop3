@@ -131,7 +131,7 @@ class User(AbstractUser):
         # Удаление временного файла
         os.remove(temp_file_path)
 
-        return f"{settings.MEDIA_URL}{s3_key}" # Возвращаем путь для модели Django (это будет URL, а не локальный путь)
+        return s3_key # Возвращаем путь для модели Django (это будет URL, а не локальный путь)
 
     def optimize_image(self, image):
         image = image.convert('RGB')  # Преобразуем в RGB
@@ -154,12 +154,6 @@ class User(AbstractUser):
 
     def get_user_profile_photo(self):
         return self.profile_photo.url
-
-    def is_default_profile_photo(self):
-        default_profile_photo = True
-        if self.profile_photo.name != 'user_profile_photo/default_profile_photo.jpg':
-            default_profile_photo = False
-        return default_profile_photo
 
 
 
