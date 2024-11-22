@@ -20,14 +20,19 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 admin.site.site_header = 'Я освобожденный Джанго'
 admin.site.index_title = 'Главное управление по управлению всеми управлениями на сайте'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('knizhnaya_lavka/', include('book_app.urls')),
-] + debug_toolbar_urls() + static(
-    settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-) + static(
-    settings.CONTENT_URL, document_root=settings.CONTENT_ROOT
-)
+]
+
+if not settings.USE_S3:
+    if settings.DEBUG:
+         urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(
+             settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+         ) + static(settings.CONTENT_URL, document_root=settings.CONTENT_ROOT)
+    else:
+         urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

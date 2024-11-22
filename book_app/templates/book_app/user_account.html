@@ -6,7 +6,7 @@
 {% block content %}
 
     <h2>Личный кабинет</h2>
-    <img src="{{ user.profile_photo.url }}" alt="Фото профиля" class="profile-photo"> {{ user }}
+    <img src="{{ user.get_user_profile_photo }}" alt="Фото профиля" class="profile-photo"> {{ user }}
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <p>Загрузить фото профиля:</p>

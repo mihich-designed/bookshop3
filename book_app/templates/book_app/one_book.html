@@ -66,7 +66,7 @@
     <p>Отзывы:</p>
     {% if ratings %}
     {% for rating in ratings %}
-    <img src="{{ rating.user.profile_photo.url }}" alt="{{ rating.user }}" class="icon-profile-photo">
+    <img src="{{ rating.user.get_user_profile_photo }}" alt="{{ rating.user }}" class="icon-profile-photo">
     <div class="rating-info">
         <span class="user-name">{{ rating.user }}</span>
         <span class="star">&#9733;</span>

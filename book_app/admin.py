@@ -26,6 +26,7 @@ class PageCountFilter(admin.SimpleListFilter):
 
 class BookAdmin(admin.ModelAdmin):
 
+
     list_display = ['title', 'author', 'year', 'format',] # Настройка отображения колонок модели в админке
     list_editable = ['year', 'format'] # Выбор данных для редакции
     ordering= ['-rating'] # Сортировка

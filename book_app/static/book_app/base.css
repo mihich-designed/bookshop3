@@ -176,18 +176,13 @@ nav a:hover {
   height: 100px;
   border-radius: 15%;
   object-fit: cover;
-<<<<<<< HEAD
-  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
-=======
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
->>>>>>> book_feedback
   border: 2px solid #ccc;
   transition: box-shadow 0.3s ease;
 }
 
 .profile-photo:hover {
   transform: scale(1.05); /*  Увеличить  фото  при  наведении  */
-<<<<<<< HEAD
 }
 
 .icon-profile-photo:hover {
@@ -254,6 +249,5 @@ nav a:hover {
   margin-top: 15px; /* Отступ сверху от отзыва */
   margin-bottom: 10px; /* Отступ снизу от отзыва */
   clear: both;
-=======
->>>>>>> book_feedback
+
 }

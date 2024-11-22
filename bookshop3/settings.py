@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -119,6 +121,7 @@ USE_I18N = True
 USE_TZ = True
 
 # Настройки S3 хранилища
+load_dotenv()
 
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
@@ -132,7 +135,7 @@ AWS_S3_OBJECT_PARAMETERS = {
 
 STATIC_BUCKET_NAME = os.getenv('STATIC_BUCKET_NAME')
 MEDIA_BUCKET_NAME = os.getenv('MEDIA_BUCKET_NAME')
-CONTENT_BUCKET_NAME = os.getenv('CONTENT_BUCKET_NAME')
+# CONTENT_BUCKET_NAME = os.getenv('CONTENT_BUCKET_NAME')
 
 USE_S3 = int(os.getenv('USE_S3', default=1))
 
@@ -141,19 +144,27 @@ if USE_S3:
     STATICFILES_STORAGE = 'bookshop_storages.storages_config.StaticStorage'
 
     MEDIA_URL = f'{AWS_S3_ENDPOINT_URL}/{MEDIA_BUCKET_NAME}/'
-    DEFAULT_FILE_STORAGE = 'myapp.storages.MediaStorage'
+    DEFAULT_FILE_STORAGE = 'bookshop_storages.storages_config.MediaStorage'
+
+    # CONTENT_URL = f'{AWS_S3_ENDPOINT_URL}/{CONTENT_BUCKET_NAME}/'
+    # CONTENT_STORAGE = 'bookshop_storages.storages_config.MediaStorage'
 
 # Static files (CSS, JavaScript, Images)
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR,'static')
-]
+else:
+    STATIC_URL = 'static/'
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-STATIC_URL = 'static/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # Установка пути к папке media
-MEDIA_URL = '/media/'
-CONTENT_URL = 'content'
-CONTENT_ROOT = os.path.join(BASE_DIR, 'content')
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # Установка пути к папке media
+
+    # CONTENT_URL = 'content'
+    # CONTENT_ROOT = os.path.join(BASE_DIR, 'content')
+
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR,'book_app')
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

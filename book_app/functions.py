@@ -1,6 +1,6 @@
 from transliterate import translit
 from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.conf import settings
 from .models import User, Rating, BookClick
 from .forms import UserFeedbackForm
 from django.db.models import F, Sum, Min, Max, Count, Avg, Value
@@ -8,8 +8,9 @@ from django.db.models.functions import Round
 from django.utils.crypto import get_random_string
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
-import requests
-# from bs4 import BeautifulSoup
+import boto3
+from django.http import JsonResponse
+
 
 
 def transliter(slug: str):
@@ -111,6 +112,48 @@ def rating_count_end(request, book):
         end = 'ка'
     return end
 
+def delete_old_profile_photo(file_key):
+    s3 = boto3.client('s3',
+                      aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                      aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                      endpoint_url=settings.AWS_S3_ENDPOINT_URL)
+    try:
+        s3.delete_object(Bucket=settings.MEDIA_BUCKET_NAME, Key=file_key.name)
+        # return JsonResponse({'success': True, 'message': 'Фото профиля успешно обновлено'})
+    except:
+        pass
+        # return JsonResponse({'success': False, 'message': 'Такого файла не существует'})
+
 
 def ebooks_downloader():
-    pass
+    books_for_download = {
+        "Лев Толстой": ["Анна Каренина", "Воскресение", "Севастопольские рассказы"],
+        "Чарльз Диккенс": ["Оливер Твист", "Большие надежды", "Повесть о двух городах", "Дэвид Копперфилд"],
+        "Джейн Остин": ["Гордость и предубеждение", "Эмма", "Разум и чувства", "Мэнсфилд-парк"],
+        "Марк Твен": ["Приключения Тома Сойера", "Приключения Гекльберри Финна",
+                      "Янки из Коннектикута при дворе короля Артура", "Жизнь на Миссисипи"],
+        "Братья Гримм": ["Золушка", "Красная Шапочка", "Белоснежка", "Рапунцель", "Гензель и Гретель"],
+        "Ганс Христиан Андерсен": ["Русалочка", "Гадкий утенок", "Снежная королева", "Дюймовочка"],
+        "Роберт Льюис Стивенсон": ["Остров сокровищ", "Странная история доктора Джекилла и мистера Хайда"],
+        "Жюль Верн": ["Двадцать тысяч льё под водой", "Вокруг света за 80 дней", "Дети капитана Гранта",
+                      "Путешествие к центру Земли"],
+        "Герберт Уэллс": ["Война миров", "Машина времени", "Человек-невидимка", "Остров доктора Моро"],
+        "Мэри Шелли": ["Франкенштейн"],
+        "Брэм Стокер": ["Дракула"],
+        "Эдгар Аллан По": ["Ворон", "Убийство на улице Морг", "Золотой жук", "Падение дома Ашеров"],
+        "Николай Гоголь": ["Мертвые души", "Вий", "Нос", "Шинель", "Тарас Бульба"],
+        "Александр Пушкин": ["Евгений Онегин", "Капитанская дочка", "Руслан и Людмила"],
+        "Михаил Лермонтов": ["Герой нашего времени", "Мцыри"],
+        "Льюис Кэрролл": ["Алиса в Стране чудес", "Алиса в Зазеркалье"],
+        "Оскар Уайльд": ["Портрет Дориана Грея", "Сказка о преданном друге"],
+        "Антон Чехов": ["Палата №6", "Вишневый сад", "Чайка", "Дядя Ваня"],
+        "Генрик Ибсен": ["Кукольный дом"],
+        "Агата Кристи": ["Убийство Роджера Экройда", "Тайна Синих Каравел"],
+        "Фрэнсис Скотт Фицджеральд": ["Великий Гэтсби"],
+        "Людвиг Беме": ["Созерцание"],
+        "Рабиндранат Тагор": ["Гитанджали"],
+        "Артур Конан Дойл": ["Записки о Шерлоке Холмсе", "Собака Баскервилей"],
+        "Александр Дюма": ["Три мушкетера", "Королева Марго", "Графиня де Монсоро"],
+
+    }
+

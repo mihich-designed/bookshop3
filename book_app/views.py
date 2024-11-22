@@ -1,17 +1,16 @@
 from django.shortcuts import render, redirect, HttpResponseRedirect
-from django.urls import reverse
-from .models import Book, Author, User, Rating, Genre, EBookFile
+from .models import Book, Author, User, Rating, Genre
 from . import functions
 from django.db.models import F, Sum, Min, Max, Count, Avg, Value, Q
 from . import forms
-from django.contrib.auth.hashers import make_password, check_password
+from django.conf import settings
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from django.conf import settings
-import os
+
 
 
 
@@ -82,16 +81,18 @@ class UserAccountView(View):
             logout(request) # Выход из сессии
             return redirect('user-authorization')
         old_profile_photo = request.user.profile_photo
-        old_profile_photo_path = f'{settings.BASE_DIR}{old_profile_photo.url}'
+        old_profile_photo_file = old_profile_photo
         form = forms.UploadProfilePhotoForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
-            if old_profile_photo != 'user_profile_photo/default_profile_photo.jpg':
-                if os.path.exists(old_profile_photo_path):
+            if not User.is_default_profile_photo(request.user): # Если фото профиля не дефолтное
+                if old_profile_photo_file: # Если существует данный файл
                     if request.FILES:
-                        os.remove(old_profile_photo_path)
+                        # Удаление старого фото из хранилища
+                        functions.delete_old_profile_photo(old_profile_photo_file)
                     if 'delete_photo' in request.POST:
+                        # Установка дефолтного фото профиля и удаление старого
                         request.user.profile_photo = 'user_profile_photo/default_profile_photo.jpg'
-                        os.remove(old_profile_photo_path)
+                        functions.delete_old_profile_photo(old_profile_photo_file)
             form.save()
             return redirect('user-account')
             # return JsonResponse({'success':True, 'message':'Фото профиля успешно загружено'})
