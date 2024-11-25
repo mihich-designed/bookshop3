@@ -81,18 +81,17 @@ class UserAccountView(View):
             logout(request) # Выход из сессии
             return redirect('user-authorization')
         old_profile_photo = request.user.profile_photo
-        old_profile_photo_file = old_profile_photo
         form = forms.UploadProfilePhotoForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             if old_profile_photo.name != 'user_profile_photo/default_profile_photo.jpg': # Если фото профиля не дефолтное
-                if old_profile_photo_file: # Если существует данный файл
-                    if request.FILES:
+                if old_profile_photo: # Если существует данный файл
+                    if request.FILES: # Если в запросе есть файлы
                         # Удаление старого фото из хранилища
-                        functions.delete_old_profile_photo(old_profile_photo_file)
-                    if 'delete_photo' in request.POST:
+                        functions.delete_old_profile_photo(old_profile_photo.file)
+                    if 'delete_photo' in request.POST: # Если нет файлов в запросе и есть запрос на удаление фото
                         # Установка дефолтного фото профиля и удаление старого
                         request.user.profile_photo = 'user_profile_photo/default_profile_photo.jpg'
-                        functions.delete_old_profile_photo(old_profile_photo_file)
+                        functions.delete_old_profile_photo(old_profile_photo)
             form.save()
             return redirect('user-account')
             # return JsonResponse({'success':True, 'message':'Фото профиля успешно загружено'})

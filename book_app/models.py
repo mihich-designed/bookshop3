@@ -106,8 +106,8 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         if self.profile_photo:
-            self.profile_photo = self.preprocess_image(self.profile_photo)
-            # self.profile_photo_hash = self.calculate_hash(self.profile_photo)  # обновляем hash
+            if self.profile_photo.name != 'user_profile_photo/default_profile_photo.jpg':
+                self.profile_photo = self.preprocess_image(self.profile_photo)
         super().save(*args, **kwargs)
 
     def preprocess_image(self, image_field):
@@ -135,7 +135,7 @@ class User(AbstractUser):
 
     def optimize_image(self, image):
         image = image.convert('RGB')  # Преобразуем в RGB
-        image.thumbnail((800, 800))  # Размер 800х800 px
+        image.thumbnail((200, 200))  # Размер в px
         return image
 
     def upload_to_s3(self, file_path, s3_key):
@@ -192,11 +192,6 @@ class BookPicture(models.Model):
 
     def get_picture_path(self):
         return os.path.join(settings.MEDIA_URL, self.picture.name)
-
-
-
-# Настройка хранилища для электронных книг
-# ebook_storage = FileSystemStorage(location=f'{settings.MEDIA_URL}ebooks') # Указываем путь к папке
 
 def get_upload_path(instance, filename):
   '''Функция для создания пути для файла в upload_to'''
