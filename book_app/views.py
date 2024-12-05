@@ -13,7 +13,6 @@ from django.http import JsonResponse
 from time import time
 
 
-
 # Create your views here.
 
 
@@ -21,20 +20,24 @@ def main_page(request):
     '''Главная страница библиотеки'''
     books = Book.objects.all()
     agg = books.aggregate(Avg('rating'), Count('id'), Min('page_count'), Max('page_count'))  # Общая агрегация
-    agg_shortest_book = books.aggregate(Min('page_count'))['page_count__min']  # Агрегация по минимальному количеству страниц
-    agg_longest_book = books.aggregate(Max('page_count'))['page_count__max']  # Агрегация по максимальному количеству страниц
+    agg_shortest_book = books.aggregate(Min('page_count'))[
+        'page_count__min']  # Агрегация по минимальному количеству страниц
+    agg_longest_book = books.aggregate(Max('page_count'))[
+        'page_count__max']  # Агрегация по максимальному количеству страниц
     shortest_book = Book.objects.get(page_count=agg_shortest_book)
     longest_book = Book.objects.get(page_count=agg_longest_book)
     context = {
         'books': books,
-        'agg':agg,
+        'agg': agg,
         'shortest_book': shortest_book,
         'longest_book': longest_book,
     }
     return render(request, 'book_app/main_page.html', context=context)
 
+
 class AuthorizationView(View):
     '''Представление для авторизации пользователя'''
+
     def get(self, request):
         form = forms.UserAuthorizationForm()
         error_counter = 0
@@ -46,7 +49,7 @@ class AuthorizationView(View):
     @csrf_exempt
     def post(self, request):
         form = forms.UserAuthorizationForm(request, data=request.POST)
-        error_counter = 0 # Счетчик неудачных попыток входа
+        error_counter = 0  # Счетчик неудачных попыток входа
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
@@ -64,31 +67,33 @@ class AuthorizationView(View):
             'error_counter': error_counter,
         })
 
+
 class UserAccountView(View):
     '''Переход в личный кабинет'''
+
     def get(self, request):
         if not request.user.is_authenticated:  # Если юзер не авторизован, (либо @login_required вначале метода)
             return redirect('user-authorization')  # его выкинет на страницу авторизации
         form = forms.UploadProfilePhotoForm(instance=request.user)
-        return render(request, 'book_app/user_account.html',{
-            'user': request.user, # Передаем информацию о пользователе
+        return render(request, 'book_app/user_account.html', {
+            'user': request.user,  # Передаем информацию о пользователе
             'form': form,
         })
 
     @csrf_exempt
     def post(self, request):
         if 'logout' in request.POST:
-            logout(request) # Выход из сессии
+            logout(request)  # Выход из сессии
             return redirect('user-authorization')
         old_profile_photo = request.user.profile_photo
         form = forms.UploadProfilePhotoForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
-            if old_profile_photo.name != 'user_profile_photo/default_profile_photo.jpg': # Если фото профиля не дефолтное
-                if old_profile_photo: # Если существует данный файл
-                    if request.FILES: # Если в запросе есть файлы
+            if old_profile_photo.name != 'user_profile_photo/default_profile_photo.jpg':  # Если фото профиля не дефолтное
+                if old_profile_photo:  # Если существует данный файл
+                    if request.FILES:  # Если в запросе есть файлы
                         # Удаление старого фото из хранилища
                         functions.delete_old_profile_photo(old_profile_photo.file)
-                    if 'delete_photo' in request.POST: # Если нет файлов в запросе и есть запрос на удаление фото
+                    if 'delete_photo' in request.POST:  # Если нет файлов в запросе и есть запрос на удаление фото
                         # Установка дефолтного фото профиля и удаление старого
                         request.user.profile_photo = 'user_profile_photo/default_profile_photo.jpg'
                         functions.delete_old_profile_photo(old_profile_photo)
@@ -96,41 +101,45 @@ class UserAccountView(View):
             return redirect('user-account')
             # return JsonResponse({'success':True, 'message':'Фото профиля успешно загружено'})
         # return JsonResponse({'success':False, 'message':'Ошибка, попробуйте еще раз'})
-        return render(request, 'book_app/user_account.html',{
+        return render(request, 'book_app/user_account.html', {
             'user': request.user,
             'form': form,
         })
 
+
 class UserRegistrationView(View):
     '''Регистрация нового пользователя'''
+
     def get(self, request):
         form = forms.UserRegistrationForm()
-        return render(request, 'book_app/registration.html', {'form':form})
+        return render(request, 'book_app/registration.html', {'form': form})
 
     @csrf_exempt
     def post(self, request):
         form = forms.UserRegistrationForm(request.POST)
         if form.is_valid():
             # Сохранение пользователя
-            user = form.save(commit=False) # Делаем сохранение не сразу
+            user = form.save(commit=False)  # Делаем сохранение не сразу
             # Установка пароля, так как form.save() не устанавливает его
             user.password = make_password(form.cleaned_data['password'])  # Хеширование пароля
             user.save()
             # return JsonResponse({'success': True})
             return redirect('user-authorization')  # Перенаправление на страницу входа
         return JsonResponse({'success': False, 'error': 'Данные не прошли валидацию на сервере'})
+
+
 def show_all_books(request):
     '''
     Передает содержимое модели Book в all_books.html
     Сортирует книги по выбранным параметрам
     Обрабатывает поисковый запрос
     '''
-    query = request.GET.get('q', None) # Поисковый запрос
-    sorting_parameter = request.GET.get('sorting_parameter', '-rating') # Сортировка по выбранному параметру
-    genre_filter = request.GET.get('genre_parameter', None) # Фильтр по жанру
+    query = request.GET.get('q', None)  # Поисковый запрос
+    sorting_parameter = request.GET.get('sorting_parameter', '-rating')  # Сортировка по выбранному параметру
+    genre_filter = request.GET.get('genre_parameter', None)  # Фильтр по жанру
     genres = Genre.objects.order_by('genre')
     functions.ebooks_downloader()
-    if query: # Обработка поискового запроса
+    if query:  # Обработка поискового запроса
         search_results = Book.objects.filter(
             Q(title__istartswith=query.capitalize()) | Q(title__icontains=query) |
             Q(author__full_name__istartswith=query.capitalize()) | Q(author__full_name__icontains=query.capitalize())
@@ -139,8 +148,9 @@ def show_all_books(request):
         if genre_filter:
             search_results = Book.objects.filter(genre=genre_filter)
         elif sorting_parameter == '-rating':
-            search_results = Book.objects.annotate(average_rating=Avg('rating__rating')
-                                                   ).order_by('-average_rating') # Сортировка по рейтингу
+            search_results = Book.objects.annotate(
+                average_rating=Avg('rating__rating')
+            ).order_by('-average_rating')  # Сортировка по рейтингу
         elif sorting_parameter == '-bookclick':
             search_results = Book.objects.annotate(view_count=Count('bookclick__book')).order_by('-view_count')
         else:
@@ -148,14 +158,16 @@ def show_all_books(request):
     for book in search_results:
         avg_book_rating = functions.avg_rating(request, book)
         book.average_rating = avg_book_rating
-        book.rating_count = functions.rating_count(request, book) # Возвращает кол-во оценок
-        book.rating_end = functions.rating_count_end(request, book) # Возвращает окончание в зависимсоти от кол-ва оцен(ок/ки/ка)
-    context={
-        'search_results':search_results,
-        'query':query,
-        'genres':genres,
+        book.rating_count = functions.rating_count(request, book)  # Возвращает кол-во оценок
+        book.rating_end = functions.rating_count_end(request,
+                                                     book)  # Возвращает окончание в зависимсоти от кол-ва оцен(ок/ки/ка)
+    context = {
+        'search_results': search_results,
+        'query': query,
+        'genres': genres,
     }
     return render(request, 'book_app/all_books.html', context=context)
+
 
 def show_one_book(request, book_slug: str):
     '''
@@ -165,29 +177,30 @@ def show_one_book(request, book_slug: str):
     - Вспомогательная функция rating_chek проверяет наличие записи и обновляет рейтинг
     '''
     try:
-        book = functions.book_cache(book_slug) #
+        book = functions.book_cache(book_slug)  #
         avg_book_rating = functions.avg_rating(request, book)
-        rating_exists = False # По умолчанию
+        rating_exists = False  # По умолчанию
         form = forms.UserFeedbackForm()
         ratings = functions.rating_cache(book)  #
         # book_feedbacks = [rating.feedback for rating in ratings]
         if request.user.is_authenticated:
             user = User.objects.get(username=request.user.username)
-            rating_exists = functions.rating_exists_cache(request, book, user) # Rating.objects.filter(book=book, user=user).exists()  # Кэширование
-            functions.bookclicks(request, book, user) # Проверяет просмотры книги
+            rating_exists = functions.rating_exists_cache(request, book, user)  # Кэширование
+            functions.bookclicks(request, book, user)  # Проверяет просмотры книги
             functions.rating_check(request, rating_exists, book, user)
         return render(request, 'book_app/one_book.html', {
-                'book': book,
-                'user_authenticate': request.user.is_authenticated,
-                'rating_exists': rating_exists,
-                'avg_book_rating': avg_book_rating,
-                'form': form,
-                'ratings': ratings
-            })
+            'book': book,
+            'user_authenticate': request.user.is_authenticated,
+            'rating_exists': rating_exists,
+            'avg_book_rating': avg_book_rating,
+            'form': form,
+            'ratings': ratings
+        })
     except Book.DoesNotExist:
         return render(request, 'book_app/404.html', {
-                'page_404': functions.transliter(book_slug)
+            'page_404': functions.transliter(book_slug)
         })
+
 
 def show_all_authors(request):
     '''Представление страницы с авторами книг из библиотеки'''
@@ -195,13 +208,13 @@ def show_all_authors(request):
     context = {
         'authors': authors,
     }
-
     return render(request, 'book_app/all_authors.html', context=context)
+
 
 def about_author(request, author_slug: str):
     try:
-        author = Author.objects.get(slug=author_slug) # Ищем автора по его slug, переданному из all_authors.html
-        books = author.book_set.all() # Получаем все книги, связанные с этим автором
+        author = Author.objects.get(slug=author_slug)  # Ищем автора по его slug, переданному из all_authors.html
+        books = author.book_set.all()  # Получаем все книги, связанные с этим автором
         context = {
             'author_slug': author_slug,
             'author': author,
@@ -209,13 +222,15 @@ def about_author(request, author_slug: str):
         }
         return render(request, 'book_app/about_author.html', context=context)
     except Author.DoesNotExist:
-        context={
+        context = {
             'page_404': functions.transliter(author_slug)
         }
         return render(request, 'book_app/404.html', context=context)
 
+
 class AccountRecoveryView(View):
     '''Восстановление доступа к аккаунту, указание эл. почты'''
+
     def get(self, request):
         form = forms.AccountRecoveryForm()
         return render(request, 'account_recovery/account_recovery.html', {'form': form})
@@ -233,8 +248,10 @@ class AccountRecoveryView(View):
         # return JsonResponse({'success': False, 'error': 'Данные не прошли валидацию на сервере'})
         return render(request, 'account_recovery/account_recovery.html', {'form': form})
 
+
 class PasswordResetView(View):
     '''Сброс пароля, ввод проверочного кода'''
+
     def get(self, request):
         form = forms.PasswordResetForm(request=request)
         request_new_code = request.GET.get('request_new_code', None)
@@ -255,6 +272,7 @@ class PasswordResetView(View):
             'form': form,
         })
 
+
 class SetNewPasswordView(View):
     def get(self, request):
         form = forms.SetNewPassword()
@@ -273,5 +291,3 @@ class SetNewPasswordView(View):
             user.save()
             return redirect('user-authorization')
         return render(request, 'account_recovery/set_new_password.html', {'form': clean_form})
-
-
