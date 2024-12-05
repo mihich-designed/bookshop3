@@ -18,6 +18,7 @@ class MediaStorage(S3Boto3Storage):
     location = ''
     bucket_name = os.getenv('MEDIA_BUCKET_NAME')
     default_acl = 'public-read'
+    file_overwrite = False
 
 class ContentStorage(S3Boto3Storage):
     location = 'content'

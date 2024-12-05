@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-
+from time import time
 
 
 
@@ -165,15 +165,15 @@ def show_one_book(request, book_slug: str):
     - Вспомогательная функция rating_chek проверяет наличие записи и обновляет рейтинг
     '''
     try:
-        book = Book.objects.get(slug=book_slug)
+        book = functions.book_cache(book_slug) #
         avg_book_rating = functions.avg_rating(request, book)
         rating_exists = False # По умолчанию
         form = forms.UserFeedbackForm()
-        ratings = Rating.objects.filter(book=book)
+        ratings = functions.rating_cache(book)  #
         # book_feedbacks = [rating.feedback for rating in ratings]
         if request.user.is_authenticated:
             user = User.objects.get(username=request.user.username)
-            rating_exists = Rating.objects.filter(book=book, user=user).exists()
+            rating_exists = functions.rating_exists_cache(request, book, user) # Rating.objects.filter(book=book, user=user).exists()  # Кэширование
             functions.bookclicks(request, book, user) # Проверяет просмотры книги
             functions.rating_check(request, rating_exists, book, user)
         return render(request, 'book_app/one_book.html', {

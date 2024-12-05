@@ -7,7 +7,7 @@
 <h2>О книге «{{book.title}}»</h2>
 <p>Книга «{{book.title}}» опубликована в {{book.year}} году, автор - {{book.author}}.</p>
 <p>{{book.description}}.</p>
-<p>Рейтинг книжной лавки: {{avg_book_rating}}.
+<p>Рейтинг книжной лавки: {{avg_book_rating}} <br>
     Количиство страниц: {{book.page_count}}.</p>
 {% if book.ebookfile_set.first is not None %}
 <div class="book-download">

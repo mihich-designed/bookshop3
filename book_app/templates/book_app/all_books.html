@@ -44,10 +44,10 @@
                             <a href="{% url 'author-info' book.author|slugify_ru %}">{{ book.author }}</a>
                         </span>
                         <br>
-                        {% if book.average_rating %}
-                            <span class="star">&#9733;</span>{{ book.average_rating}}
-                        {% else %}
+                        {% if book.average_rating == 'оцените книгу первым!' %}
                             <span class="star">&#9734;</span>
+                        {% else %}
+                            <span class="star">&#9733;</span>{{ book.average_rating }}
                         {% endif %}
                         <span class="rating-count">{{ book.rating_count.rating__count }} оцен{{book.rating_end}}</span>
                         <br>

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'debug_toolbar',
     'bookshop_storages',
+    'rest_framework',
 
 ]
 
@@ -89,6 +90,16 @@ DATABASES = {
     }
 }
 
+# Redis cache
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

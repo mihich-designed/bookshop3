@@ -27,13 +27,13 @@ class PageCountFilter(admin.SimpleListFilter):
 class BookAdmin(admin.ModelAdmin):
 
 
-    list_display = ['title', 'author', 'year', 'format',] # Настройка отображения колонок модели в админке
-    list_editable = ['year', 'format'] # Выбор данных для редакции
+    list_display = ['title', 'author', 'year',] # Настройка отображения колонок модели в админке
+    list_editable = ['year',] # Выбор данных для редакции
     ordering= ['-rating'] # Сортировка
     list_per_page = 8 # Кол-во записей на странице
-    actions = ['set_fb2', 'set_epub',] # Регистрация действия
+    # actions = ['set_fb2', 'set_epub',] # Регистрация действия
     search_fields = ['title__iregex'] # Поиск по названию книги, регистр кириллицы учитывается, поэтому применяем __iregex
-    list_filter = ['format', 'bestseller', PageCountFilter] # Ну это фильтры епта
+    list_filter = ['bestseller', PageCountFilter] # Ну это фильтры епта
 
 
     # Вычисляемое поле для админки, показывает суммарный рейтинг книги:
@@ -42,19 +42,19 @@ class BookAdmin(admin.ModelAdmin):
     #     return round(book.rating * book.rating_count, 1)
 
     # Действие об изменение формата выбранных книг
-    @admin.action(description='Установить формат FB2')
-    def set_fb2(self, request, queryset: QuerySet):
-        queryset.update(format=Book.F)
+    # @admin.action(description='Установить формат FB2')
+    # def set_fb2(self, request, queryset: QuerySet):
+    #     queryset.update(format=Book.F)
 
     # Действие об изменение формата выбранных книг
-    @admin.action(description='Установить формат EPUB')
-    def set_epub(self, request, queryset: QuerySet):
-        updates_count = queryset.update(format=Book.E)
-        self.message_user(
-            request,
-            f'Было обновлено {updates_count} записей',
-            level=messages.INFO # Меняет цвет сообщения
-        )
+    # @admin.action(description='Установить формат EPUB')
+    # def set_epub(self, request, queryset: QuerySet):
+    #     updates_count = queryset.update(format=Book.E)
+    #     self.message_user(
+    #         request,
+    #         f'Было обновлено {updates_count} записей',
+    #         level=messages.INFO # Меняет цвет сообщения
+    #     )
 class BookPictureAdmin(admin.ModelAdmin):
     '''Исключает отображение записей из моделей, связанных с Book'''
     raw_id_fields = ('book',)

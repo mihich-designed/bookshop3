@@ -9,6 +9,8 @@ import boto3
 import uuid
 from PIL import Image
 import tempfile
+import zipfile
+import tempfile
 
 # Create your models here.
 
@@ -67,9 +69,9 @@ class Book(models.Model):
     bestseller = models.BooleanField(null=True, verbose_name="Бестселлер")
     slug = models.SlugField(default='', blank=True)
     description = models.CharField(max_length=500, default='Описание будет добавлено позже', verbose_name="Описание")
-    format = models.CharField(max_length=1, choices=BOOK_FORMATS, default=F, verbose_name="Формат")
     author = models.ForeignKey(Author, on_delete=models.CASCADE, null=True, default = 'Автор')
     genre = models.ManyToManyField(Genre)
+    isbn = models.CharField(null=True, verbose_name="ISBN", default='Не указан', max_length=17)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title)
@@ -86,9 +88,23 @@ class Book(models.Model):
             self.bookpicture
         except BookPicture.DoesNotExist:
             self.bookpicture = BookPicture.objects.create(
-                book=self, picture=f'{settings.MEDIA_URL}book_covers/default_book_cover.jpg'
+                book=self, picture=f'book_covers/default_book_cover.jpg'
             )  # Создаем и связываем
         return self.bookpicture.get_picture_path()
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'page_count': self.page_count,
+            'year': self.year,
+            'bestseller': self.bestseller,
+            'slug': self.slug,
+            'description': self.description,
+            'author': self.author,
+            'genre': self.genre,
+            'isbn': self.isbn,
+        }
 
 
 class User(AbstractUser):
@@ -172,6 +188,16 @@ class Rating(models.Model):
     def __str__(self):
         return f'Рейтинг {self.book}'
 
+    def to_json(self):
+        return {
+            'id': self.id,
+            'user': self.user,
+            'book': self.book,
+            'rating': self.rating,
+            'feedback': self.feedback,
+            'created_at': self.created_at
+        }
+
 
 class BookClick(models.Model):
     '''Просмотры книги'''
@@ -182,10 +208,16 @@ class BookClick(models.Model):
     def __str__(self):
         return f"{self.book} - {self.user}"
 
+def get_book_cover_upload_path(instance, filename):
+    '''Функция создания пути для обложки в upload_to'''
+    ext = os.path.splitext(filename)[1].lower()
+    filename = f'{instance.book.slug}{ext}'
+    return f'book_covers/{filename}'
+
 class BookPicture(models.Model):
     '''Обложка книги'''
     book = models.OneToOneField(Book, on_delete=models.CASCADE)
-    picture = models.ImageField(upload_to=f'book_covers/')
+    picture = models.ImageField(upload_to=get_book_cover_upload_path)
 
     def __str__(self):
         return f'Обложка для {self.book}'
@@ -194,8 +226,16 @@ class BookPicture(models.Model):
         return os.path.join(settings.MEDIA_URL, self.picture.name)
 
 def get_upload_path(instance, filename):
-  '''Функция для создания пути для файла в upload_to'''
-  return f'ebooks/{instance.book.slug}/{filename}'
+  '''Функция создания пути для ebook в upload_to'''
+  ext = os.path.splitext(filename)[1].lower()  # Извлекаем расширение с .
+  filename = f'{instance.book.slug}-{instance.file_type}{ext}'  # Изменяем имя
+  if ext == '.zip':
+      archive = zipfile.ZipFile(instance.ebook, 'r')
+      with tempfile.TemporaryDirectory() as temp_dir: # Создание временной директории
+          archive.extractall(temp_dir) # Распаковка архива во временную директорию
+          file = os.listdir(temp_dir)[0] #
+          os.rename(file, filename)
+  return f'ebooks/{instance.book.slug}-{instance.book.id}/{filename}'
 
 class EBookFile(models.Model):
     '''Хранит электронные книги'''

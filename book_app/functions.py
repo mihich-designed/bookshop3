@@ -1,7 +1,7 @@
 from transliterate import translit
 from django.shortcuts import render, redirect
 from django.conf import settings
-from .models import User, Rating, BookClick
+from .models import User, Rating, BookClick, Book
 from .forms import UserFeedbackForm
 from django.db.models import F, Sum, Min, Max, Count, Avg, Value
 from django.db.models.functions import Round
@@ -9,14 +9,47 @@ from django.utils.crypto import get_random_string
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 import boto3
-from django.http import JsonResponse
+from django.http import JsonResponse #
+from django.core.cache import cache
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
-
+CACHE_TTL = None
+# CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 def transliter(slug: str):
     '''Транслит переданного url-запроса в кириллицу для обработки ошибки 404'''
     transliteration = translit(slug, 'ru').capitalize().replace('-', ' ')
     return transliteration
+
+def rating_cache(book):
+    if f'book{book.id}_ratings' in cache:
+        ratings = cache.get(f'book{book.id}_ratings')
+    else:
+        ratings = Rating.objects.filter(book=book)
+        cache.set(f'book{book.id}_ratings', ratings, timeout=CACHE_TTL)
+    return ratings
+def book_cache(book_slug):
+    '''Проверяет кэш на наличии книги и записывает атрибуты книги в кэш'''
+    if f'{book_slug}' in cache:
+        book = cache.get(f'{book_slug}')
+    else:
+        book = Book.objects.get(slug=book_slug)
+        cache.set(f'{book.slug}', book, timeout=CACHE_TTL)
+    return book
+
+
+def rating_exists_cache(request, book, user):
+    '''Проверяет и записывает в кэш существование оценки данной книги данным пользователем'''
+    if f'rating{book.id}{user.id}' in cache: # Если конкретный рейтинг в кэше
+        if request.POST.get('rating', None): # Если был отправлен отзыв
+            cache.set(f'rating{book.id}{user.id}', True, timeout=CACHE_TTL)
+        rating_exists = cache.get(f'rating{book.id}{user.id}')
+    else:
+        rating_exists = Rating.objects.filter(book=book, user=user).exists()
+        cache.set(f'rating{book.id}{user.id}', rating_exists, timeout=CACHE_TTL)
+    return rating_exists
+
+
 
 
 def rating_check(request, rating_exists, book, user):
@@ -33,11 +66,10 @@ def rating_check(request, rating_exists, book, user):
 
 
 def avg_rating(request, book):
-    try:
-        book_rating = Rating.objects.filter(book=book)
-        avg_book_rating = book_rating.aggregate(average_rating=Round(Avg('rating'), 1))['average_rating']
-    except Rating.DoesNotExist:
-        avg_book_rating = 'нет оценок'
+    book_rating = Rating.objects.filter(book=book)
+    avg_book_rating = book_rating.aggregate(average_rating=Round(Avg('rating'), 1))['average_rating']
+    if avg_book_rating is None:
+        avg_book_rating = 'оцените книгу первым!'
     return avg_book_rating
 
 
