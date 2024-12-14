@@ -17,7 +17,6 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -28,7 +27,6 @@ SECRET_KEY = 'django-insecure-s1g67r^^6d+^yj)jmh=zv5^+*^vktfx#fbh-m-(buwit=0(=im
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -79,16 +77,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'bookshop3.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'django',
+        'USER': 'django_admin',
+        'PASSWORD': 'Michael19032001!',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 # Redis cache
 CACHES = {
@@ -118,7 +125,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -167,14 +173,13 @@ else:
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
     MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # Установка пути к папке media
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Установка пути к папке media
 
     # CONTENT_URL = 'content'
     # CONTENT_ROOT = os.path.join(BASE_DIR, 'content')
 
-
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR,'book_app')
+    os.path.join(BASE_DIR, 'book_app')
 ]
 
 # Default primary key field type

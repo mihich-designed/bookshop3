@@ -9,17 +9,20 @@ from django.utils.crypto import get_random_string
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 import boto3
-from django.http import JsonResponse #
+from django.http import JsonResponse  #
 from django.core.cache import cache
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
 CACHE_TTL = None
+
+
 # CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 def transliter(slug: str):
     '''Транслит переданного url-запроса в кириллицу для обработки ошибки 404'''
     transliteration = translit(slug, 'ru').capitalize().replace('-', ' ')
     return transliteration
+
 
 def rating_cache(book):
     if f'book{book.id}_ratings' in cache:
@@ -28,6 +31,8 @@ def rating_cache(book):
         ratings = Rating.objects.filter(book=book)
         cache.set(f'book{book.id}_ratings', ratings, timeout=CACHE_TTL)
     return ratings
+
+
 def book_cache(book_slug):
     '''Проверяет кэш на наличии книги и записывает атрибуты книги в кэш'''
     if f'{book_slug}' in cache:
@@ -40,16 +45,14 @@ def book_cache(book_slug):
 
 def rating_exists_cache(request, book, user):
     '''Проверяет и записывает в кэш существование оценки данной книги данным пользователем'''
-    if f'rating{book.id}{user.id}' in cache: # Если конкретный рейтинг в кэше
-        if request.POST.get('rating', None): # Если был отправлен отзыв
+    if f'rating{book.id}{user.id}' in cache:  # Если конкретный рейтинг в кэше
+        if request.POST.get('rating', None):  # Если был отправлен отзыв
             cache.set(f'rating{book.id}{user.id}', True, timeout=CACHE_TTL)
         rating_exists = cache.get(f'rating{book.id}{user.id}')
     else:
         rating_exists = Rating.objects.filter(book=book, user=user).exists()
         cache.set(f'rating{book.id}{user.id}', rating_exists, timeout=CACHE_TTL)
     return rating_exists
-
-
 
 
 def rating_check(request, rating_exists, book, user):
@@ -144,6 +147,7 @@ def rating_count_end(request, book):
         end = 'ка'
     return end
 
+
 def delete_old_profile_photo(file_key):
     s3 = boto3.client('s3',
                       aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -188,4 +192,3 @@ def ebooks_downloader():
         "Александр Дюма": ["Три мушкетера", "Королева Марго", "Графиня де Монсоро"],
 
     }
-

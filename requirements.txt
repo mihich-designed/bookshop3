@@ -9,7 +9,9 @@ Django==5.0.7
 django-allauth==64.2.1
 django-debug-toolbar==4.4.6
 django-extensions==3.2.3
+django-redis==5.4.0
 django-storages==1.14.4
+djangorestframework==3.15.2
 dnspython==2.6.1
 docutils==0.21.2
 html5lib==1.1
@@ -17,9 +19,11 @@ idna==3.10
 jmespath==1.0.1
 mechanize==0.4.10
 pillow==10.4.0
+psycopg2-binary==2.9.10
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 pytils==0.4.1
+redis==5.2.0
 requests==2.32.3
 s3transfer==0.10.3
 six==1.16.0
@@ -29,3 +33,5 @@ transliterate==1.10.2
 tzdata==2024.1
 urllib3==2.2.2
 webencodings==0.5.1
+gevent
+gunicorn
