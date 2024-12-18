@@ -30,7 +30,7 @@ services:
             dockerfile: docker/python/Dockerfile
 # монтируем директорию проекта
         volumes:
-            - ./<project>:/srv/www/<project>
+            - ./bookshop3:/srv/www/bookshop3
         expose:
           - 8000
         ports:
